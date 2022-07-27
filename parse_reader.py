@@ -16,6 +16,10 @@ parser.add_argument("-o",
                     type=str,
                     help="path to output file")
 
+class Format(object):
+  full_no_labels = "full|none"
+  para_relation = "paragraph|relation"
+
 
 def multiple_replace(re_dict, text):
   for pattern, sub in re_dict.items():
@@ -33,13 +37,18 @@ def multiple_replace(re_dict, text):
     return "", text
 
 
-re_dict = {
-    "\(span[0-9\s]+\)\s?": "",
-    "\(rel2par.[A-Za-z\-]+\)": "",
-    "\(leaf.[0-9]+\) ": "",
-    "Root ": "",
-    "Nucleus ": "",
-    "Satellite ": "",
+class Pattern(object):
+  span = "\(span[0-9\s]+\)\s?"
+  rel2par = "\(rel2par.[A-Za-z\-]+\)"
+  leaf = "\(leaf.[0-9]+\) "
+  root = "Root "
+  nucleus = "Nucleus "
+  satellite = "Satellite "
+  ALL = [span, rel2par, leaf, root, nucleus, satellite]
+
+PATTERNS_TO_DELETE = {
+  Format.full_no_labels: Pattern.ALL
+  Format.para_relation: [span, leaf, root, nucleus, satellite]
 }
 
 
@@ -61,7 +70,7 @@ def get_paths(directory):
   train_dev_files = glob.glob(f'{directory}/TRAINING/wsj_*.out.dis')
   train_files = train_dev_files[:300]
   dev_files = train_dev_files[300:]
-  test_files = glob.glob(f'{directory}/TESTING/wsj_*.out.dis')
+  test_files = glob.glob(f'{directory}/TEST/wsj_*.out.dis')
   return {"train": train_files,
           "dev": dev_files,
           "test": test_files}
